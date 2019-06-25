@@ -3,7 +3,7 @@
 Plugin Name: Worship Security Online LLMS Modifications
 Plugin URI: https://github.com/genoo-source/worship-security-online-llms-modifications
 Description: For managing the Account Manager user role
-Version: 0.1
+Version: 0.2
 Author: Genoo LLC
 Author URI: http://genoo.com/
 License: GPLv2
@@ -77,8 +77,18 @@ function create_user_in_membership() {
 }
 add_action('wp_ajax_create_user_in_membership', 'create_user_in_membership');
 
+function get_user_role() {
+	global $current_user;
+
+	$user_roles = $current_user->roles;
+	$user_role = array_shift($user_roles);
+
+	return $user_role;
+}
+
 // Add metabox
 function enroll_new_students_meta_box_add() {
+	if ( get_user_role() != 'accountmanagertemplate' ) return;
 	add_meta_box( 'enroll-new-students', 'Enroll a new Student', 'enroll_new_students', 'llms_membership', 'normal', 'low' );
 }
 add_action( 'add_meta_boxes', 'enroll_new_students_meta_box_add' );
@@ -129,17 +139,9 @@ function enroll_new_students() {
 }
 
 
-function get_user_role() {
-    global $current_user;
-
-    $user_roles = $current_user->roles;
-    $user_role = array_shift($user_roles);
-
-    return $user_role;
-}
 
 function custom_admin_styles() {
-	if ( get_user_role() != 'administrator' ) return;
+	if ( get_user_role() != 'accountmanagertemplate' ) return;
   echo '<style class="custom-css">
     .llms-metabox-section.llms-metabox-students-add-new,
 		#lifterlms-membership,
